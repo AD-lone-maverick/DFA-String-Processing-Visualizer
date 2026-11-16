@@ -1,9 +1,10 @@
 # DFA String Processing Visualizer & Automata Theory Engine
 
 An interactive, pedagogical **Deterministic Finite Automaton (DFA) String Processing Visualizer** built to animate state transitions, computation paths, and formal acceptance/rejection criteria in Automata Theory.
-
 ---
-
+## Project Prototype Demo Link
+https://github.com/AD-lone-maverick/DFA-String-Processing-Visualizer
+---
 ## 🌟 Key Capabilities & Features
 
 ### 1. Multiple Automaton Input Formats

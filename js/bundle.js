@@ -2612,11 +2612,6 @@ class App {
     document.getElementById('btn-run-batch').addEventListener('click', () => {
       this.runBatchTests();
     });
-
-    // Export / Import
-    document.getElementById('btn-export-json').addEventListener('click', () => this.exportJSON());
-    document.getElementById('file-import-json').addEventListener('change', (e) => this.importJSON(e));
-    document.getElementById('btn-export-svg').addEventListener('click', () => this.exportSVG());
   }
 
   convertRegexToDFA(regexStr, sampleString = null) {

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DFA String Processing Visualizer | Automata Theory Engine</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top App Navigation Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">δ</div>
+      <div class="brand-title">Automata<span>Lab</span> &mdash; DFA Visualizer</div>
+    </div>
+
+    <div class="header-center">
+      <select id="preset-select" class="preset-dropdown" title="Select a classic Automata Theory preset">
+        <!-- Loaded dynamically -->
+      </select>
+    </div>
+
+    <div class="header-actions">
+      <button id="btn-export-json" class="btn btn-sm" title="Download DFA configuration as JSON">
+        <span>💾 Export JSON</span>
+      </button>
+      <label class="btn btn-sm cursor-pointer" title="Load DFA from JSON file">
+        <span>📁 Import JSON</span>
+        <input type="file" id="file-import-json" accept=".json" style="display: none;">
+      </label>
+      <button id="btn-export-svg" class="btn btn-sm" title="Save high-resolution SVG diagram">
+        <span>🖼 Export SVG</span>
+      </button>
+      <button id="btn-help" class="btn btn-sm btn-primary" onclick="document.getElementById('help-modal').classList.remove('hidden')">
+        <span>📘 Theory & Help</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Split Layout Container -->
+  <div class="app-container">
+
+    <!-- Left Sidebar: Automaton Definition & Properties -->
+    <aside class="sidebar-panel">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Automaton Specification</div>
+        <div class="mode-tabs">
+          <button class="mode-tab-btn active" data-tab="tab-manual" id="tab-manual-btn">Manual DFA</button>
+          <button class="mode-tab-btn" data-tab="tab-regex" id="tab-regex-btn">Regex &rarr; DFA</button>
+          <button class="mode-tab-btn" data-tab="tab-grammar" id="tab-grammar-btn">Grammar &rarr; DFA</button>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+
+        <!-- Tab 1: Manual DFA Definition -->
+        <div id="tab-manual" class="tab-pane active">
+          <div class="form-group">
+            <label for="manual-states">States (Q):</label>
+            <input type="text" id="manual-states" class="form-input" placeholder="q0, q1, q2">
+            <span class="form-hint">Comma-separated list of finite states.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="manual-alphabet">Alphabet (&Sigma;):</label>
+            <input type="text" id="manual-alphabet" class="form-input" placeholder="0, 1">
+            <span class="form-hint">Input symbols. E.g., 0, 1 or a, b.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="manual-start">Start State (q<sub>0</sub>):</label>
+            <input type="text" id="manual-start" class="form-input" placeholder="q0">
+          </div>
+
+          <div class="form-group">
+            <label for="manual-accept">Accept / Final States (F):</label>
+            <input type="text" id="manual-accept" class="form-input" placeholder="q0, q2">
+            <span class="form-hint">Subset of Q that accept strings.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="manual-transitions">Transition Rules (&delta;: Q &times; &Sigma; &rarr; Q):</label>
+            <textarea id="manual-transitions" class="form-textarea" placeholder="q0, 0 -> q0&#10;q0, 1 -> q1"></textarea>
+            <span class="form-hint">Format: <code>state, symbol -> nextState</code> per line.</span>
+          </div>
+
+          <button id="btn-apply-manual" class="btn btn-primary">Apply Definition</button>
+        </div>
+
+        <!-- Tab 2: Regular Expression to DFA -->
+        <div id="tab-regex" class="tab-pane">
+          <div class="form-group">
+            <label for="regex-input">Regular Expression:</label>
+            <input type="text" id="regex-input" class="form-input" value="(a|b)*abb" placeholder="e.g. (0|1)*01 or (a|b)*abb">
+            <span class="form-hint">Supports: <code>|</code> (union), <code>*</code> (star), <code>+</code> (plus), <code>?</code> (optional), <code>( )</code>, <code>ε</code>.</span>
+          </div>
+
+          <div class="form-group" style="flex-direction: row; align-items: center; gap: 8px;">
+            <input type="checkbox" id="regex-minimize-toggle" checked style="accent-color: var(--accent-cyan);">
+            <label for="regex-minimize-toggle" style="cursor: pointer; margin: 0;">Auto-minimize resulting DFA (Hopcroft)</label>
+          </div>
+
+          <button id="btn-convert-regex" class="btn btn-primary">Convert Regex to DFA</button>
+          <div class="form-hint">
+            <strong>Algorithm:</strong> Shunting-Yard &rarr; Thompson's &epsilon;-NFA &rarr; Subset Construction &rarr; Hopcroft Minimization.
+          </div>
+        </div>
+
+        <!-- Tab 3: Regular Grammar to DFA -->
+        <div id="tab-grammar" class="tab-pane">
+          <div class="form-group">
+            <label for="grammar-input">Right-Linear Production Rules:</label>
+            <textarea id="grammar-input" class="form-textarea" style="min-height: 120px;" placeholder="S -> 0S | 1A&#10;A -> 0A | 1S | ε"></textarea>
+            <span class="form-hint">Right-linear format: <code>A -> aB | b | ε</code>. Start symbol is first rule LHS.</span>
+          </div>
+
+          <button id="btn-convert-grammar" class="btn btn-primary">Convert Grammar to DFA</button>
+        </div>
+
+        <!-- Automaton Health, Completeness & Actions -->
+        <div class="properties-card">
+          <div class="sidebar-title">Automaton Properties</div>
+          <div id="automaton-stats">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;">
+            <button id="btn-minimize-dfa" class="btn btn-sm" title="Run Hopcroft partition refinement to minimize states">
+              <span>⚡ Minimize DFA</span>
+            </button>
+            <button id="btn-complete-dfa" class="btn btn-sm" title="Add explicit dead/trap state for missing transitions">
+              <span>🛡 Complete with Trap State</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Transition Matrix -->
+        <div class="properties-card">
+          <div class="sidebar-title">Transition Matrix (&delta;)</div>
+          <div id="transition-table-container">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Center Stage: Tape, State Graph & Visual Controls -->
+    <main class="main-stage">
+
+      <!-- Top Tape & String Ribbon Bar -->
+      <section class="tape-bar-container">
+        <div class="string-input-row">
+          <div class="string-input-box">
+            <span style="color: var(--text-dim); margin-right: 6px; font-family: var(--font-mono); font-size: 0.85rem;">w =</span>
+            <input type="text" id="string-input" value="110" placeholder="Enter input string w ∈ Σ* (or leave empty for ε)">
+          </div>
+          <button id="btn-load-string" class="btn btn-primary btn-sm">Load String</button>
+          <div id="preset-info" style="font-size: 0.82rem; color: var(--text-muted); flex: 1;"></div>
+        </div>
+
+        <!-- Quick Test Cases Pills -->
+        <div class="test-cases-pills-row">
+          <span class="test-cases-label">Quick Tests:</span>
+          <div id="test-cases-pills" style="display: flex; gap: 6px; flex-wrap: nowrap;">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+        <!-- Tape Cells Ribbon with Reading Head -->
+        <div class="tape-ribbon" id="tape-container">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Computation Status Banner -->
+        <div class="status-banner">
+          <div id="status-badge" class="badge badge-info">READY</div>
+          <div id="status-message" class="status-message">Load an input string and use playback controls to begin execution.</div>
+        </div>
+      </section>
+
+      <!-- SVG Graph Canvas -->
+      <div class="graph-viewport" id="graph-viewport">
+        <!-- Floating Canvas Toolbar -->
+        <div class="graph-floating-tools">
+          <button id="btn-zoom-in" class="btn btn-icon btn-sm" title="Zoom In">+</button>
+          <button id="btn-zoom-out" class="btn btn-icon btn-sm" title="Zoom Out">&minus;</button>
+          <button id="btn-zoom-reset" class="btn btn-icon btn-sm" title="Reset View">⤢</button>
+          <button id="btn-relayout" class="btn btn-sm" title="Recompute planar graph layout">↺ Re-layout</button>
+        </div>
+
+        <svg id="dfa-svg" class="dfa-svg"></svg>
+      </div>
+
+      <!-- Playback Controls Bar -->
+      <footer class="controls-bar">
+        <div class="playback-buttons">
+          <button id="btn-reset" class="btn btn-icon" title="Reset to start state (Step 0)">&#10094;&#10094;</button>
+          <button id="btn-step-back" class="btn btn-icon" title="Step backward (rewind 1 symbol)">&#10094;</button>
+          <button id="btn-play" class="btn btn-primary" title="Play animation">▶ Play</button>
+          <button id="btn-pause" class="btn btn-primary hidden" title="Pause animation">❚❚ Pause</button>
+          <button id="btn-step-fwd" class="btn btn-icon" title="Step forward (consume 1 symbol)">&#10095;</button>
+          <button id="btn-fast-fwd" class="btn btn-icon" title="Fast forward to end of string">&#10095;&#10095;</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted);">
+            <input type="checkbox" id="particle-toggle" checked style="accent-color: var(--accent-cyan); cursor: pointer;">
+            <label for="particle-toggle" style="cursor: pointer;">Edge Particles</label>
+          </div>
+
+          <div class="playback-speed">
+            <span>Speed:</span>
+            <input type="range" id="speed-slider" class="speed-slider" min="150" max="2000" step="50" value="800">
+            <span id="speed-label" style="font-family: var(--font-mono); width: 40px;">0.80s</span>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+
+    <!-- Right Drawer: Formal Trace Ledger & Batch Test Runner -->
+    <aside class="drawer-panel">
+      <div class="drawer-header">
+        <div class="drawer-title">Computation Trace & Verification</div>
+      </div>
+
+      <div class="drawer-content">
+
+        <!-- Formal Step Ledger -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="font-bold text-sm" style="color: var(--text-muted);">Formal Step Trace (&delta;*)</label>
+            <span style="font-size: 0.72rem; color: var(--text-dim);">Click row to jump</span>
+          </div>
+
+          <div class="trace-table-wrapper">
+            <table class="trace-table">
+              <thead>
+                <tr>
+                  <th style="width: 32px;">#</th>
+                  <th>q</th>
+                  <th>a</th>
+                  <th>q'</th>
+                  <th>Remaining</th>
+                  <th>Rule</th>
+                </tr>
+              </thead>
+              <tbody id="trace-table-body">
+                <!-- Trace rows populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Batch Test Suite -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="font-bold text-sm" style="color: var(--text-muted);">Batch Test Suite</label>
+            <button id="btn-run-batch" class="btn btn-sm btn-primary">Run Suite</button>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 8px;">
+            <textarea id="batch-strings-input" class="form-textarea" style="min-height: 80px;" placeholder="0&#10;1&#10;110&#10;1001&#10;101">0
+1
+11
+110
+1001
+1100
+101</textarea>
+            <span class="form-hint">One test string per line (use 'ε' for empty string). Click result row to inspect.</span>
+          </div>
+
+          <div class="batch-results-wrapper">
+            <table class="batch-table">
+              <thead>
+                <tr>
+                  <th>String (w)</th>
+                  <th>|w|</th>
+                  <th>Final State</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody id="batch-results-body">
+                <!-- Batch rows populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Educational Theory & Instructions Modal -->
+  <div id="help-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--accent-cyan);">Automata Theory & Visualizer Reference</h2>
+        <button class="btn btn-sm btn-icon" onclick="document.getElementById('help-modal').classList.add('hidden')">✕</button>
+      </div>
+
+      <div style="font-size: 0.88rem; line-height: 1.6; color: #cbd5e1; display: flex; flex-direction: column; gap: 14px;">
+        <p>
+          A <strong>Deterministic Finite Automaton (DFA)</strong> is a 5-tuple:
+          <br>
+          <code style="background: #1e293b; padding: 3px 6px; border-radius: 4px; color: #38bdf8;">M = (Q, Σ, δ, q₀, F)</code>
+        </p>
+        <ul style="padding-left: 20px; list-style-type: square; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Q</strong>: Finite set of internal states (rendered as circular nodes).</li>
+          <li><strong>Σ</strong>: Finite set of input symbols (alphabet).</li>
+          <li><strong>δ: Q × Σ &rarr; Q</strong>: Transition function defining the unique next state for each state and input symbol.</li>
+          <li><strong>q₀ &in; Q</strong>: Initial / start state (denoted by the incoming green arrow).</li>
+          <li><strong>F &sube; Q</strong>: Set of final / accepting states (rendered with concentric double circles).</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1rem; margin-top: 6px;">String Processing & Acceptance Criterion</h3>
+        <p>
+          The extended transition function &delta;* consumes string <em>w = a₁a₂...aₙ</em> sequentially:
+          <br>
+          &delta;*(q, &epsilon;) = q<br>
+          &delta;*(q, wa) = &delta;(&delta;*(q, w), a)
+          <br>
+          The automaton <strong>accepts</strong> string <em>w</em> if and only if &delta;*(q₀, w) &in; F (ends in an accept state).
+        </p>
+
+        <h3 style="color: #fff; font-size: 1rem; margin-top: 6px;">Algorithms Implemented</h3>
+        <ul style="padding-left: 20px; list-style-type: square; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Thompson's Construction:</strong> Converts postfix regular expressions to equivalent &epsilon;-NFAs.</li>
+          <li><strong>Subset / Powerset Construction:</strong> Converts &epsilon;-NFAs to equivalent DFAs with &epsilon;-closure computation.</li>
+          <li><strong>Hopcroft's DFA Minimization:</strong> Uses iterative partition refinement to compute the unique minimal state DFA.</li>
+          <li><strong>Grammar Parser:</strong> Direct synthesis from Right-Linear Regular Grammars (Chomsky Type 3).</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1rem; margin-top: 6px;">Interactive Features</h3>
+        <ul style="padding-left: 20px; list-style-type: square; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Draggable States:</strong> Click and drag any state to customize planar graph arrangement.</li>
+          <li><strong>Pan & Zoom:</strong> Use mouse wheel to zoom, drag empty canvas to pan.</li>
+          <li><strong>Time Travel:</strong> Step backward / rewind computation at any time.</li>
+          <li><strong>Live Batch Verification:</strong> Enter a suite of strings to test all outcomes simultaneously.</li>
+        </ul>
+
+        <div style="margin-top: 10px; text-align: right;">
+          <button class="btn btn-primary" onclick="document.getElementById('help-modal').classList.add('hidden')">Got it!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Script (Works under file:// and http://) -->
+  <script src="js/bundle.js"></script>
+</body>
+</html>

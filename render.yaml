@@ -3,3 +3,4 @@ services:
     name: dfa-visualizer
     env: static
     staticPublishPath: ./
+

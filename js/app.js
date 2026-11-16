@@ -93,10 +93,6 @@ class App {
       document.getElementById('tab-regex-btn').click();
       document.getElementById('regex-input').value = preset.rawInput;
       this.convertRegexToDFA(preset.rawInput, preset.sampleInput || '');
-    } else if (preset.type === 'grammar') {
-      document.getElementById('tab-grammar-btn').click();
-      document.getElementById('grammar-input').value = preset.rawInput;
-      this.convertGrammarToDFA(preset.rawInput, preset.sampleInput || '');
     }
 
     // Populate quick test case pills
@@ -251,30 +247,6 @@ class App {
       const regexStr = document.getElementById('regex-input').value.trim();
       if (!regexStr) return;
       this.convertRegexToDFA(regexStr);
-    });
-
-    // Grammar conversion
-    document.getElementById('btn-convert-grammar').addEventListener('click', () => {
-      const grammarStr = document.getElementById('grammar-input').value.trim();
-      if (!grammarStr) return;
-      this.convertGrammarToDFA(grammarStr);
-    });
-
-    // Minimization button
-    document.getElementById('btn-minimize-dfa').addEventListener('click', () => {
-      this.minimizeCurrentDFA();
-    });
-
-    // Complete DFA button
-    document.getElementById('btn-complete-dfa').addEventListener('click', () => {
-      if (!this.currentDFA) return;
-      const trap = this.currentDFA.completeWithTrapState('q_dead');
-      if (trap) {
-        this.setAutomaton(this.currentDFA);
-        alert(`Completed DFA with trap state "${trap}".`);
-      } else {
-        alert('DFA is already complete (all states have transitions for every symbol in Σ).');
-      }
     });
 
     // Manual editor events

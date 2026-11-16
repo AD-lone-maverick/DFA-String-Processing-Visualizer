@@ -127,17 +127,6 @@ export const PRESETS = [
     description: 'Identifiers starting with a letter {a, b} followed by letters or digits {a, b, 0, 1}.',
     sampleInput: 'a0b1',
     testCases: ['a', 'b', 'a1', 'b0', 'ab10', '0a', '1b', '0', '1', '']
-  },
-  {
-    id: 'grammar_even_as',
-    name: 'Grammar: Even Number of a\'s',
-    category: 'Regular Grammars',
-    type: 'grammar',
-    rawInput: `S -> bS | aA | ε
-A -> bA | aS`,
-    description: 'Right-linear regular grammar generating strings with an even number of \'a\'s over alphabet {a, b}.',
-    sampleInput: 'bbaab',
-    testCases: ['', 'b', 'aa', 'baab', 'aaba', 'a', 'aba', 'aaa', 'aab']
   }
 ];
 

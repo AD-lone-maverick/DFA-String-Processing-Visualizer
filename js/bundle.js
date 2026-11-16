@@ -503,6 +503,7 @@ class DFA {
   }
 }
 
+
   /**
  * Regular Expression to DFA Converter
  * 1. Shunting-Yard (Infix -> Postfix with explicit concatenation)
@@ -904,6 +905,7 @@ class RegexEngine {
   }
 }
 
+
   /**
  * Regular Grammar (Right-Linear Grammar) to DFA Converter
  * Supports:
@@ -1116,6 +1118,7 @@ class GrammarEngine {
   }
 }
 
+
   /**
  * DFA Minimizer using Hopcroft's / Moore's Partition Refinement Algorithm
  * Computes minimal DFA and records step-by-step partition history.
@@ -1282,6 +1285,7 @@ class DFAMinimizer {
   }
 }
 
+
   /**
  * Interactive SVG Graph Visualizer for DFA States & Transitions
  * Supports draggable nodes, bezier curves, self-loops, zoom/pan,
@@ -1323,11 +1327,11 @@ class GraphVisualizer {
         </marker>
         <!-- Arrowhead Marker for Highlighted Edges -->
         <marker id="arrow-active" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" />
+          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#0284c7" />
         </marker>
         <!-- Arrowhead Marker for Start Arrow -->
         <marker id="arrow-start" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#22c55e" />
+          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#059669" />
         </marker>
         <!-- Glow filters -->
         <filter id="glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
@@ -1708,13 +1712,13 @@ class GraphVisualizer {
 
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('r', 9);
-    circle.setAttribute('fill', '#38bdf8');
+    circle.setAttribute('fill', '#0284c7');
     circle.setAttribute('filter', 'url(#glow-cyan)');
 
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('dominant-baseline', 'central');
-    text.setAttribute('fill', '#0f172a');
+    text.setAttribute('fill', '#ffffff');
     text.setAttribute('font-size', '10px');
     text.setAttribute('font-weight', 'bold');
     text.textContent = symbol || '';
@@ -2015,6 +2019,7 @@ class TapeVisualizer {
   }
 }
 
+
   /**
  * Simulation Controller for DFA String Execution
  * Manages step-by-step playback, backwards rewind, speed, and status events.
@@ -2213,6 +2218,7 @@ class Simulator {
   }
 }
 
+
   /**
  * Automata Theory Presets Catalog
  * Contains classic and pedagogical DFAs, Regexes, and Grammars.
@@ -2342,19 +2348,9 @@ const PRESETS = [
     description: 'Identifiers starting with a letter {a, b} followed by letters or digits {a, b, 0, 1}.',
     sampleInput: 'a0b1',
     testCases: ['a', 'b', 'a1', 'b0', 'ab10', '0a', '1b', '0', '1', '']
-  },
-  {
-    id: 'grammar_even_as',
-    name: 'Grammar: Even Number of a\'s',
-    category: 'Regular Grammars',
-    type: 'grammar',
-    rawInput: `S -> bS | aA | ε
-A -> bA | aS`,
-    description: 'Right-linear regular grammar generating strings with an even number of \'a\'s over alphabet {a, b}.',
-    sampleInput: 'bbaab',
-    testCases: ['', 'b', 'aa', 'baab', 'aaba', 'a', 'aba', 'aaa', 'aab']
   }
 ];
+
 
   /**
  * DFA String Processing Visualizer - Main Application Controller
@@ -2451,10 +2447,6 @@ class App {
       document.getElementById('tab-regex-btn').click();
       document.getElementById('regex-input').value = preset.rawInput;
       this.convertRegexToDFA(preset.rawInput, preset.sampleInput || '');
-    } else if (preset.type === 'grammar') {
-      document.getElementById('tab-grammar-btn').click();
-      document.getElementById('grammar-input').value = preset.rawInput;
-      this.convertGrammarToDFA(preset.rawInput, preset.sampleInput || '');
     }
 
     // Populate quick test case pills
@@ -2609,30 +2601,6 @@ class App {
       const regexStr = document.getElementById('regex-input').value.trim();
       if (!regexStr) return;
       this.convertRegexToDFA(regexStr);
-    });
-
-    // Grammar conversion
-    document.getElementById('btn-convert-grammar').addEventListener('click', () => {
-      const grammarStr = document.getElementById('grammar-input').value.trim();
-      if (!grammarStr) return;
-      this.convertGrammarToDFA(grammarStr);
-    });
-
-    // Minimization button
-    document.getElementById('btn-minimize-dfa').addEventListener('click', () => {
-      this.minimizeCurrentDFA();
-    });
-
-    // Complete DFA button
-    document.getElementById('btn-complete-dfa').addEventListener('click', () => {
-      if (!this.currentDFA) return;
-      const trap = this.currentDFA.completeWithTrapState('q_dead');
-      if (trap) {
-        this.setAutomaton(this.currentDFA);
-        alert(`Completed DFA with trap state "${trap}".`);
-      } else {
-        alert('DFA is already complete (all states have transitions for every symbol in Σ).');
-      }
     });
 
     // Manual editor events

@@ -51,7 +51,6 @@
         <div class="mode-tabs">
           <button class="mode-tab-btn active" data-tab="tab-manual" id="tab-manual-btn">Manual DFA</button>
           <button class="mode-tab-btn" data-tab="tab-regex" id="tab-regex-btn">Regex &rarr; DFA</button>
-          <button class="mode-tab-btn" data-tab="tab-grammar" id="tab-grammar-btn">Grammar &rarr; DFA</button>
         </div>
       </div>
 
@@ -110,31 +109,11 @@
           </div>
         </div>
 
-        <!-- Tab 3: Regular Grammar to DFA -->
-        <div id="tab-grammar" class="tab-pane">
-          <div class="form-group">
-            <label for="grammar-input">Right-Linear Production Rules:</label>
-            <textarea id="grammar-input" class="form-textarea" style="min-height: 120px;" placeholder="S -> 0S | 1A&#10;A -> 0A | 1S | ε"></textarea>
-            <span class="form-hint">Right-linear format: <code>A -> aB | b | ε</code>. Start symbol is first rule LHS.</span>
-          </div>
-
-          <button id="btn-convert-grammar" class="btn btn-primary">Convert Grammar to DFA</button>
-        </div>
-
         <!-- Automaton Health, Completeness & Actions -->
         <div class="properties-card">
           <div class="sidebar-title">Automaton Properties</div>
           <div id="automaton-stats">
             <!-- Populated dynamically -->
-          </div>
-
-          <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;">
-            <button id="btn-minimize-dfa" class="btn btn-sm" title="Run Hopcroft partition refinement to minimize states">
-              <span>⚡ Minimize DFA</span>
-            </button>
-            <button id="btn-complete-dfa" class="btn btn-sm" title="Add explicit dead/trap state for missing transitions">
-              <span>🛡 Complete with Trap State</span>
-            </button>
           </div>
         </div>
 
@@ -329,12 +308,11 @@
           The automaton <strong>accepts</strong> string <em>w</em> if and only if &delta;*(q₀, w) &in; F (ends in an accept state).
         </p>
 
-        <h3 style="color: #fff; font-size: 1rem; margin-top: 6px;">Algorithms Implemented</h3>
+        <h3 style="color: #0f172a; font-size: 1rem; margin-top: 6px;">Algorithms Implemented</h3>
         <ul style="padding-left: 20px; list-style-type: square; display: flex; flex-direction: column; gap: 6px;">
           <li><strong>Thompson's Construction:</strong> Converts postfix regular expressions to equivalent &epsilon;-NFAs.</li>
           <li><strong>Subset / Powerset Construction:</strong> Converts &epsilon;-NFAs to equivalent DFAs with &epsilon;-closure computation.</li>
           <li><strong>Hopcroft's DFA Minimization:</strong> Uses iterative partition refinement to compute the unique minimal state DFA.</li>
-          <li><strong>Grammar Parser:</strong> Direct synthesis from Right-Linear Regular Grammars (Chomsky Type 3).</li>
         </ul>
 
         <h3 style="color: #fff; font-size: 1rem; margin-top: 6px;">Interactive Features</h3>

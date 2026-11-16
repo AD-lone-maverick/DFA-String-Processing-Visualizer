@@ -39,11 +39,11 @@ export class GraphVisualizer {
         </marker>
         <!-- Arrowhead Marker for Highlighted Edges -->
         <marker id="arrow-active" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#38bdf8" />
+          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#0284c7" />
         </marker>
         <!-- Arrowhead Marker for Start Arrow -->
         <marker id="arrow-start" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#22c55e" />
+          <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#059669" />
         </marker>
         <!-- Glow filters -->
         <filter id="glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
@@ -424,13 +424,13 @@ export class GraphVisualizer {
 
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('r', 9);
-    circle.setAttribute('fill', '#38bdf8');
+    circle.setAttribute('fill', '#0284c7');
     circle.setAttribute('filter', 'url(#glow-cyan)');
 
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('dominant-baseline', 'central');
-    text.setAttribute('fill', '#0f172a');
+    text.setAttribute('fill', '#ffffff');
     text.setAttribute('font-size', '10px');
     text.setAttribute('font-weight', 'bold');
     text.textContent = symbol || '';

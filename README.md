@@ -3,7 +3,7 @@
 An interactive, pedagogical **Deterministic Finite Automaton (DFA) String Processing Visualizer** built to animate state transitions, computation paths, and formal acceptance/rejection criteria in Automata Theory.
 ---
 ## Project Prototype Demo Link
-https://github.com/AD-lone-maverick/DFA-String-Processing-Visualizer
+https://dfa-visualizer-nine.vercel.app/
 ---
 ## 🌟 Key Capabilities & Features
 

@@ -2230,7 +2230,7 @@ const PRESETS = [
     name: 'Binary Divisible by 3',
     category: 'Arithmetic / Modulo',
     type: 'dfa',
-    description: 'Accepts binary representations of integers divisible by 3 (most significant bit first). $L = \\{ w \\in \\{0, 1\\}^* \\mid \\text{val}(w) \\equiv 0 \\pmod 3 \\}$.',
+    description: '',
     sampleInput: '110', // 6 in decimal -> accepts
     testCases: ['0', '11', '110', '1001', '1100', '1', '10', '100', '101', '111'],
     data: {
@@ -2436,9 +2436,9 @@ class App {
     if (!preset) return;
 
     this.presetSelect.value = presetId;
-    document.getElementById('preset-info').innerHTML = `
-      <strong>${preset.name}</strong>: ${preset.description}
-    `;
+    document.getElementById('preset-info').innerHTML = preset.description
+      ? `<strong>${preset.name}</strong>: ${preset.description}`
+      : `<strong>${preset.name}</strong>`;
 
     if (preset.type === 'dfa') {
       const dfa = DFA.fromJSON(preset.data);

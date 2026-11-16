@@ -82,9 +82,9 @@ class App {
     if (!preset) return;
 
     this.presetSelect.value = presetId;
-    document.getElementById('preset-info').innerHTML = `
-      <strong>${preset.name}</strong>: ${preset.description}
-    `;
+    document.getElementById('preset-info').innerHTML = preset.description
+      ? `<strong>${preset.name}</strong>: ${preset.description}`
+      : `<strong>${preset.name}</strong>`;
 
     if (preset.type === 'dfa') {
       const dfa = DFA.fromJSON(preset.data);
